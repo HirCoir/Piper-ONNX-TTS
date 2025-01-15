@@ -1,6 +1,7 @@
 
 # Piper-ONNX-TTS
 
+![Image](Photo.jpg)
 
 **Piper-ONNX-TTS** es una aplicación de conversión de texto a voz (TTS) basada en el modelo **Piper** y **ONNX**. Esta herramienta permite generar audio a partir de texto utilizando modelos de voz preentrenados, con una interfaz gráfica intuitiva y fácil de usar.
 
