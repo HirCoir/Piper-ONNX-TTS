@@ -13,7 +13,7 @@ from PyQt5.QtGui import QIcon, QTextDocument, QFont, QPalette, QColor
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 import webbrowser
 
-# Define el directorio donde se guardan los archivos
+# Define the directory where files are saved
 file_folder = os.path.dirname(os.path.abspath(__file__))
 temp_audio_folder = os.path.join(file_folder, 'temp_audio')
 model_folder = os.path.join(os.path.expanduser('~'), 'Documents', 'ONNX-TTS')
@@ -22,21 +22,25 @@ icon_path = os.path.join(file_folder, 'icon.ico')
 play_icon_path = os.path.join(file_folder, 'play.png')
 pause_icon_path = os.path.join(file_folder, 'pause.png')
 
-# Crea la carpeta temp_audio si no existe
+# Create the temp_audio folder if it does not exist
 os.makedirs(temp_audio_folder, exist_ok=True)
 os.makedirs(model_folder, exist_ok=True)
 
-# URL del JSON
+# JSON URL
 json_url = "https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json"
 
-# Descargar y parsear el JSON
-response = requests.get(json_url)
-voices_data = response.json()
+# Download and parse the JSON
+try:
+    response = requests.get(json_url)
+    response.raise_for_status()  # Raises an exception if the request fails
+    voices_data = response.json()
+except requests.RequestException:
+    voices_data = {}
 
-# URL base para descargar los archivos
+# Base URL for downloading files
 base_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/"
 
-# Función para descargar un archivo
+# Function to download a file
 def download_file(url, destination, progress_callback):
     response = requests.get(url, stream=True)
     total_size = int(response.headers.get('content-length', 0))
@@ -83,7 +87,7 @@ class ConvertTextToSpeechThread(QThread):
 class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Configuración')
+        self.setWindowTitle('Settings')
         self.setGeometry(100, 100, 400, 300)
         self.setWindowIcon(QIcon(icon_path))
         self.setStyleSheet('''
@@ -135,17 +139,17 @@ class SettingsDialog(QDialog):
         self.create_slider('Sentence Silence', 0, 100, int(self.parent().sentence_silence * 100), self.set_sentence_silence)
 
         button_layout = QHBoxLayout()
-        self.reset_button = QPushButton('Reestablecer')
+        self.reset_button = QPushButton('Reset')
         self.reset_button.clicked.connect(self.reset_values)
         button_layout.addWidget(self.reset_button)
 
-        self.help_button = QPushButton('Ayuda')
+        self.help_button = QPushButton('Help')
         self.help_button.clicked.connect(self.open_help_url)
         button_layout.addWidget(self.help_button)
 
         layout.addLayout(button_layout)
 
-        # Agregar el enlace "Powered by HirCoir"
+        # Add the "Powered by HirCoir" link
         self.powered_by = QLabel('<a href="https://youtube.com/@hircoir" style="color: #4CAF50;">Powered by HirCoir</a>')
         self.powered_by.setOpenExternalLinks(True)
         self.powered_by.setAlignment(Qt.AlignCenter)
@@ -228,7 +232,7 @@ class DownloadModelThread(QThread):
 class DownloadModelDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle('Descargar Modelo')
+        self.setWindowTitle('Download Model')
         self.setGeometry(100, 100, 600, 400)
         self.setWindowIcon(QIcon(icon_path))
         self.setStyleSheet('''
@@ -274,7 +278,7 @@ class DownloadModelDialog(QDialog):
         self.setLayout(layout)
 
         self.search_bar = QLineEdit()
-        self.search_bar.setPlaceholderText('Buscar modelo...')
+        self.search_bar.setPlaceholderText('Search model...')
         self.search_bar.textChanged.connect(self.filter_models)
         layout.addWidget(self.search_bar)
 
@@ -286,7 +290,7 @@ class DownloadModelDialog(QDialog):
         self.progress_bar.setVisible(False)
         layout.addWidget(self.progress_bar)
 
-        self.download_button = QPushButton('Descargar Modelo Seleccionado')
+        self.download_button = QPushButton('Download Selected Model')
         self.download_button.clicked.connect(self.download_selected_model)
         layout.addWidget(self.download_button)
 
@@ -312,9 +316,9 @@ class DownloadModelDialog(QDialog):
                 self.progress_bar.setValue(0)
                 self.download_button.setEnabled(False)
             else:
-                QMessageBox.critical(self, "Error", "Modelo no encontrado.")
+                QMessageBox.critical(self, "Error", "Model not found.")
         else:
-            QMessageBox.warning(self, "Advertencia", "Por favor, selecciona un modelo para descargar.")
+            QMessageBox.warning(self, "Warning", "Please select a model to download.")
 
     def update_progress(self, progress):
         self.progress_bar.setValue(progress)
@@ -323,7 +327,7 @@ class DownloadModelDialog(QDialog):
         self.progress_bar.setVisible(False)
         self.download_button.setEnabled(True)
         self.parent().update_model_spinner()
-        self.parent().audio_label.setText(f'Modelo {model_key} descargado exitosamente.')
+        self.parent().audio_label.setText(f'Model {model_key} downloaded successfully.')
 
 class TTSApp(QWidget):
     def __init__(self):
@@ -343,7 +347,7 @@ class TTSApp(QWidget):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('ONNX - Convertidor de texto a voz')
+        self.setWindowTitle('ONNX - Text to Speech Converter')
         self.setGeometry(100, 100, 800, 600)
         self.setWindowIcon(QIcon(icon_path))
         self.setStyleSheet('''
@@ -403,13 +407,13 @@ class TTSApp(QWidget):
 
         layout = QVBoxLayout()
 
-        title = QLabel('Convertidor de Texto a Audio')
+        title = QLabel('Text to Audio Converter')
         title.setAlignment(Qt.AlignCenter)
         title.setStyleSheet('font-size: 30px; font-weight: bold; margin-bottom: 20px;')
         layout.addWidget(title)
 
         self.text_input = QTextEdit()
-        self.text_input.setPlaceholderText('Introduce el texto aquí')
+        self.text_input.setPlaceholderText('Enter text here')
         self.text_input.textChanged.connect(self.on_text_changed)
         self.text_input.setContextMenuPolicy(Qt.CustomContextMenu)
         self.text_input.customContextMenuRequested.connect(self.show_context_menu)
@@ -426,11 +430,11 @@ class TTSApp(QWidget):
         ''')
         self.model_spinner.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         self.model_spinner.setFixedHeight(40)
-        self.model_spinner.addItem("Selecciona un modelo")
+        self.model_spinner.addItem("Select a model")
         self.update_model_spinner()
         model_layout.addWidget(self.model_spinner)
 
-        self.download_button = QPushButton('Descargar Modelo')
+        self.download_button = QPushButton('Download Model')
         self.download_button.setStyleSheet('''
             QPushButton {
                 background-color: #4CAF50;
@@ -448,24 +452,28 @@ class TTSApp(QWidget):
         self.download_button.clicked.connect(self.show_download_dialog)
         model_layout.addWidget(self.download_button)
 
+        # Disable the download button if there is no internet connection or the JSON cannot be accessed
+        if not voices_data:
+            self.download_button.setEnabled(False)
+
         layout.addLayout(model_layout)
 
         button_layout = QHBoxLayout()
-        self.convert_button = QPushButton('Generar audio')
+        self.convert_button = QPushButton('Generate Audio')
         self.convert_button.clicked.connect(self.convert_text)
         button_layout.addWidget(self.convert_button)
 
-        self.save_button = QPushButton('Guardar audio')
+        self.save_button = QPushButton('Save Audio')
         self.save_button.clicked.connect(self.save_audio)
         button_layout.addWidget(self.save_button)
 
-        self.settings_button = QPushButton('Ajuste de modelo')
+        self.settings_button = QPushButton('Model Settings')
         self.settings_button.clicked.connect(self.show_settings)
         button_layout.addWidget(self.settings_button)
 
         layout.addLayout(button_layout)
 
-        self.audio_label = QLabel('Aquí se reproducirá el audio')
+        self.audio_label = QLabel('Audio will be played here')
         self.audio_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.audio_label)
 
@@ -491,7 +499,7 @@ class TTSApp(QWidget):
         self.volume_slider.setRange(0, 100)
         self.volume_slider.setValue(self.volume)
         self.volume_slider.valueChanged.connect(self.set_volume)
-        self.audio_controls.addWidget(QLabel('Volumen'))
+        self.audio_controls.addWidget(QLabel('Volume'))
         self.audio_controls.addWidget(self.volume_slider)
 
         self.duration_label = QLabel('00:00 / 00:00')
@@ -506,7 +514,7 @@ class TTSApp(QWidget):
 
     def update_model_spinner(self):
         self.model_spinner.clear()
-        self.model_spinner.addItem("Selecciona un modelo")
+        self.model_spinner.addItem("Select a model")
         downloaded_models = [f for f in os.listdir(model_folder) if f.endswith('.onnx')]
         self.model_spinner.addItems([os.path.splitext(model)[0] for model in downloaded_models])
 
@@ -524,8 +532,8 @@ class TTSApp(QWidget):
     def convert_text(self):
         text = self.text_input.toPlainText()
         model_name = self.model_spinner.currentText()
-        if model_name == "Selecciona un modelo":
-            QMessageBox.warning(self, 'Error', 'Por favor, selecciona un modelo antes de generar el audio.')
+        if model_name == "Select a model":
+            QMessageBox.warning(self, 'Error', 'Please select a model before generating audio.')
             return
         random_name = ''.join(random.choices(string.ascii_letters + string.digits, k=8)) + '.wav'
         output_file = os.path.join(temp_audio_folder, random_name)
@@ -537,7 +545,7 @@ class TTSApp(QWidget):
         if os.path.isfile(piper_binary_path) and model_folder is not None:
             model_path = os.path.join(model_folder, model_name + '.onnx')
             if os.path.isfile(model_path):
-                self.audio_label.setText('Generando audio...')
+                self.audio_label.setText('Generating audio...')
                 self.conversion_thread = ConvertTextToSpeechThread(
                     text, model_path, output_file,
                     self.speaker, self.noise_scale, self.length_scale, self.noise_w, self.sentence_silence
@@ -545,27 +553,27 @@ class TTSApp(QWidget):
                 self.conversion_thread.conversion_done.connect(self.handle_conversion_done)
                 self.conversion_thread.start()
             else:
-                self.audio_label.setText('Modelo no encontrado.')
+                self.audio_label.setText('Model not found.')
         else:
-            self.audio_label.setText('No se encontró el binario de Piper o no se ha seleccionado una carpeta de modelos.')
+            self.audio_label.setText('Piper binary not found or no model folder selected.')
 
     def handle_conversion_done(self, output_file):
         if output_file:
             self.audio_file = output_file
-            self.audio_label.setText('Audio generado')
+            self.audio_label.setText('Audio generated')
             self.player.setMedia(QMediaContent(QUrl.fromLocalFile(output_file)))
             self.player.setVolume(self.volume)
             self.play_audio()
         else:
-            self.audio_label.setText('No se pudo generar el audio.')
+            self.audio_label.setText('Could not generate audio.')
 
     def save_audio(self):
         if self.audio_file:
-            save_path, _ = QFileDialog.getSaveFileName(self, 'Guardar archivo de audio', '', 'Audio Files (*.wav)')
+            save_path, _ = QFileDialog.getSaveFileName(self, 'Save audio file', '', 'Audio Files (*.wav)')
             if save_path:
                 os.rename(self.audio_file, save_path)
                 self.audio_file = save_path
-                QMessageBox.information(self, 'Archivo guardado', 'El archivo de audio ha sido guardado correctamente')
+                QMessageBox.information(self, 'File Saved', 'The audio file has been saved successfully')
 
     def play_audio(self):
         if self.audio_file:
@@ -615,15 +623,15 @@ class TTSApp(QWidget):
     def show_context_menu(self, pos):
         context_menu = QMenu(self)
 
-        copy_action = QAction("Copiar", self)
+        copy_action = QAction("Copy", self)
         copy_action.triggered.connect(self.text_input.copy)
         context_menu.addAction(copy_action)
 
-        paste_action = QAction("Pegar", self)
+        paste_action = QAction("Paste", self)
         paste_action.triggered.connect(self.text_input.paste)
         context_menu.addAction(paste_action)
 
-        paste_without_formatting_action = QAction("Pegar sin formato", self)
+        paste_without_formatting_action = QAction("Paste without formatting", self)
         paste_without_formatting_action.triggered.connect(self.paste_without_formatting)
         context_menu.addAction(paste_without_formatting_action)
 
@@ -655,7 +663,7 @@ if __name__ == '__main__':
     palette.setColor(QPalette.HighlightedText, Qt.black)
     app.setPalette(palette)
     tts_app = TTSApp()
-    tts_app.setWindowTitle('Convertidor de Texto a Voz')
+    tts_app.setWindowTitle('Text to Speech Converter')
     tts_app.setWindowIcon(QIcon(icon_path))
     tts_app.show()
     app.exec_()

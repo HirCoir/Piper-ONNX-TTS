@@ -30,8 +30,12 @@ os.makedirs(model_folder, exist_ok=True)
 json_url = "https://huggingface.co/rhasspy/piper-voices/raw/main/voices.json"
 
 # Descargar y parsear el JSON
-response = requests.get(json_url)
-voices_data = response.json()
+try:
+    response = requests.get(json_url)
+    response.raise_for_status()  # Lanza una excepción si la solicitud falla
+    voices_data = response.json()
+except requests.RequestException:
+    voices_data = {}
 
 # URL base para descargar los archivos
 base_url = "https://huggingface.co/rhasspy/piper-voices/resolve/main/"
@@ -447,6 +451,10 @@ class TTSApp(QWidget):
         ''')
         self.download_button.clicked.connect(self.show_download_dialog)
         model_layout.addWidget(self.download_button)
+
+        # Deshabilitar el botón de descarga si no hay conexión a internet o no se puede acceder al JSON
+        if not voices_data:
+            self.download_button.setEnabled(False)
 
         layout.addLayout(model_layout)
 
