@@ -1,0 +1,2 @@
+{ "text": "First speaker.", "speaker_id": 0, "output_file": "tmp/speaker_0.wav" }
+{ "text": "Second speaker.", "speaker_id": 1, "output_file": "tmp/speaker_1.wav" }
