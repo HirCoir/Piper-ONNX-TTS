@@ -1,4 +1,3 @@
-
 # Piper-ONNX-TTS
 
 ![Image](Photo.jpg)
@@ -15,12 +14,18 @@
 - **Guardado de Audio**: Guarda el audio generado en formato WAV para su uso posterior.
 - **Compatibilidad con Múltiples Idiomas**: Soporta una amplia variedad de idiomas y voces, gracias a los modelos disponibles en **Piper**.
 - **Configuración Avanzada**: Ajustes avanzados para personalizar la calidad y el estilo de la voz generada.
+- **Temas de Interfaz**: Cambia entre temas claros y oscuros para una mejor experiencia visual.
+- **Gestión de Modelos**: Administra los modelos descargados, incluyendo la eliminación de modelos no deseados.
+- **Búsqueda de Texto**: Funcionalidad para buscar y resaltar texto dentro del área de entrada.
+- **Inserción de Silencios**: Añade silencios personalizados entre frases.
+- **Integración de FFmpeg**: Uso de FFmpeg para la generación y concatenación de archivos de audio.
 
 ## Requisitos
 
 - **Piper**: Asegúrate de tener el binario de **Piper** (`piper.exe`) descargado y colocado en la carpeta del proyecto.
 - **Python 3.10 o superior**: La aplicación está desarrollada en Python y requiere la instalación de varias dependencias.
 - **Dependencias**: Asegúrate de instalar las dependencias necesarias utilizando `pip install -r requirements.txt`.
+- **FFmpeg**: La aplicación requiere FFmpeg para la manipulación de archivos de audio. Asegúrate de tener `ffmpeg.exe` en la carpeta del proyecto.
 
 ## Instalación
 
@@ -37,6 +42,7 @@
    pip install -r requirements.txt
    ```
 4. Descarga el binario de [**Piper**](https://github.com/rhasspy/piper/releases) y colócalo en la carpeta del proyecto.
+5. Asegúrate de tener `ffmpeg.exe` en la carpeta del proyecto.
 
 ## Uso
 
@@ -60,7 +66,7 @@ Puedes encontrar una versión compilada del proyecto en la sección de [Releases
 
 ## Licencia
 
-Este proyecto está bajo la licencia **MIT**. 
+Este proyecto está bajo la licencia **MIT**.
 
 ## Agradecimientos
 
