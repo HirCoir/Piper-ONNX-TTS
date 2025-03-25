@@ -72,3 +72,11 @@ Este proyecto está bajo la licencia **MIT**.
 
 - **Piper**: Gracias al equipo de [**Piper**](https://github.com/rhasspy/piper) por proporcionar los modelos de voz y el binario necesario.
 - **ONNX**: Gracias a [**ONNX**](https://github.com/onnx/onnx) por proporcionar el marco de trabajo para la inferencia de modelos.
+
+---
+
+### ¡Apoya el Proyecto!
+
+Si encuentras útil este proyecto, considera hacer una donación. Tu apoyo ayuda a mantener y mejorar esta herramienta. ¡Gracias!
+
+[![Donar con PayPal](https://www.paypalobjects.com/es_XC/i/btn/btn_donate_LG.gif)](https://paypal.me/hircoir)
